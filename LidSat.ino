@@ -20,7 +20,7 @@ String plTone = "0001";
 
 // Routinely configure modules
 unsigned long previousMillis = 0;
-const long interval = 500;
+const long interval = 2 * 60 * 1000;
 
 // Reconfigure the SERCOM for a second serial port for the UHF module
 Uart Serial2 (&sercom1, 11, 10, SERCOM_RX_PAD_0, UART_TX_PAD_2);
@@ -54,13 +54,20 @@ void setup()
 void loop()
 {
   // Key on carrier detect
-  digitalWrite(6, digitalRead(5));
+  bool carrierDetect = digitalRead(5);
+  digitalWrite(6, carrierDetect);
 
-  // Configure modules
+  // Reset beacon timer during use
+  if(!carrierDetect)
+  {
+    previousMillis = millis();
+  }
+
+  // Fire beacon
   if (millis() - previousMillis >= interval)
   {
     previousMillis = millis();
-    //configureModules();
+    beacon();
   }
 }
 
@@ -97,5 +104,10 @@ void configureModules()
     Serial2.print(squ);
     Serial2.print(",");
     Serial2.println("0000");
+}
+
+void beacon()
+{
+  // Do something here for a beacon
 }
 
